@@ -2,39 +2,65 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Enums\RoleEnum;
+use App\Models\User;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
-class UserFactory extends Factory
+class UserFactory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition()
+    private array $roles = [];
+    private array $permissions = [];
+
+    public static function new(): UserFactory
     {
-        return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'remember_token' => Str::random(10),
-        ];
+        return new UserFactory();
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     *
-     * @return static
-     */
-    public function unverified()
+    public function create(): User
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        $user = new User();
+        $user->name = fake()->name;
+        $user->email = fake()->unique()->safeEmail();
+        $user->email_verified_at = now();
+        $user->password = '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'; // password
+        $user->remember_token = Str::random(10);
+        $user->save();
+
+        $user->syncRoles($this->roles);
+        $user->syncPermissions($this->permissions);
+
+        return $user;
+    }
+
+    public function merchant(): UserFactory
+    {
+        $factory = clone $this;
+        return $factory->roles([RoleEnum::MERCHANT->value]);
+    }
+
+    public function admin(): UserFactory
+    {
+        $factory = clone $this;
+        return $factory->roles([RoleEnum::ADMIN->value]);
+    }
+
+    public function superadmin(): UserFactory
+    {
+        $factory = clone $this;
+        return $factory->roles([RoleEnum::SUPERADMIN->value]);
+    }
+
+    public function roles(array $roles): UserFactory
+    {
+        $factory = clone $this;
+        $factory->roles = $roles;
+        return $factory;
+    }
+
+    public function permissions(array $permissions): UserFactory
+    {
+        $factory = clone $this;
+        $factory->permissions = $permissions;
+        return $factory;
     }
 }

@@ -16,12 +16,12 @@
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">{{ __("RetailAI Homework") }}</a>
+                <a class="navbar-brand" href="/">{{ __("RetailAI Homework") }}</a>
             </div>
         </nav>
 
         <div class="row justify-content-md-center">
-            <div class="col-12 col-md-6 py-3 px-5">
+            <div class="col-12 col-md-6 py-3 px-4">
                 {{ $slot }}
             </div>
         </div>
