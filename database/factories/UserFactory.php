@@ -6,7 +6,7 @@ use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Support\Str;
 
-class UserFactory
+class UserFactory extends EloquentModelFactory
 {
     private array $roles = [];
     private array $permissions = [];

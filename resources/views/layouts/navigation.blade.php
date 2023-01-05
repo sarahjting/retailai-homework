@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="navbar navbar-expand-lg bg-body-tertiary">
+<nav x-data="{ open: false }" class="navbar navbar-expand-md bg-body-tertiary">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">{{ __("RetailAI Homework") }}</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -7,9 +7,23 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <x-nav-link href="/" :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                </li>
+                <li class="nav-item">
+                    @can(\App\Enums\PermissionEnum::PRODUCTS_READ->value)
+                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.index')">
+                            {{ __('Products') }}
+                        </x-nav-link>
+                    @endcan
+                </li>
+                <li class="nav-item">
+                    @role([\App\Enums\RoleEnum::ADMIN->value, \App\Enums\RoleEnum::SUPERADMIN->value])
+                        <x-nav-link :href="route('products.admin.index')" :active="request()->routeIs('products.admin.index')">
+                            {{ __('Products admin panel') }}
+                        </x-nav-link>
+                    @endrole
                 </li>
             </ul>
             <ul class="navbar-nav">

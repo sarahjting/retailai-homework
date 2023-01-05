@@ -14,13 +14,11 @@
         @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     </head>
     <body>
-        <div>
-            @include('layouts.navigation')
+        @include('layouts.navigation')
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
+        <!-- Page Content -->
+        <main>
+            {{ $slot }}
+        </main>
     </body>
 </html>

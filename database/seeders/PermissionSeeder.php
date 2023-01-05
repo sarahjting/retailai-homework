@@ -19,11 +19,11 @@ class PermissionSeeder extends Seeder
 
         /** @var Role $admin_role */
         $adminRole = Role::create(['name' => RoleEnum::ADMIN]);
+
+        // admins do not get initialized with create/read/update
+        // the reason is we need to be able to revoke these later
         $adminRole->givePermissionTo([
-            $permissions[PermissionEnum::PRODUCTS_CREATE->value],
             $permissions[PermissionEnum::PRODUCTS_READ->value],
-            $permissions[PermissionEnum::PRODUCTS_UPDATE->value],
-            $permissions[PermissionEnum::PRODUCTS_DELETE->value],
         ]);
 
         $merchantRole = Role::create(['name' => RoleEnum::MERCHANT]);

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth\UserController;
 
+use App\Enums\PermissionEnum;
 use App\Enums\RoleEnum;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
@@ -23,6 +24,13 @@ class StoreTest extends DatabaseTestCase
         $this->assertTrue($user->hasRole(RoleEnum::MERCHANT->value));
         $this->assertFalse($user->hasRole(RoleEnum::ADMIN->value));
         $this->assertFalse($user->hasRole(RoleEnum::SUPERADMIN->value));
+
+        $this->assertTrue($user->hasPermissionTo(PermissionEnum::PRODUCTS_READ->value));
+        $this->assertFalse($user->hasAnyPermission([
+            PermissionEnum::PRODUCTS_CREATE->value,
+            PermissionEnum::PRODUCTS_UPDATE->value,
+            PermissionEnum::PRODUCTS_DELETE->value,
+        ]));
     }
 
     public function test_new_admins_can_register(): void
@@ -39,6 +47,13 @@ class StoreTest extends DatabaseTestCase
         $this->assertFalse($user->hasRole(RoleEnum::MERCHANT->value));
         $this->assertTrue($user->hasRole(RoleEnum::ADMIN->value));
         $this->assertFalse($user->hasRole(RoleEnum::SUPERADMIN->value));
+
+        $this->assertTrue($user->hasAllPermissions([
+            PermissionEnum::PRODUCTS_READ->value,
+            PermissionEnum::PRODUCTS_CREATE->value,
+            PermissionEnum::PRODUCTS_UPDATE->value,
+            PermissionEnum::PRODUCTS_DELETE->value,
+        ]));
     }
 
     public function test_new_superadmins_cannot_register(): void

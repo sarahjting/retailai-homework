@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\PermissionEnum;
+use App\Enums\RoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\CreateUserRequest;
 use App\Models\User;
@@ -29,6 +31,11 @@ class UserController extends Controller
         ]);
 
         $user->assignRole($role);
+        $user->syncPermissions(
+            collect(RoleEnum::tryFrom($role->name)
+                ->defaultPermissions())
+                ->map(fn (PermissionEnum $enum) => $enum->value)
+        );
 
         Auth::login($user);
 
