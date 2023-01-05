@@ -31,4 +31,13 @@ enum RoleEnum: string
             default => [],
         };
     }
+
+    // array of roles that can be edited via the superadmin panel
+    public static function adminnableRoles(): array
+    {
+        return [
+            RoleEnum::ADMIN,
+            RoleEnum::MERCHANT,
+        ];
+    }
 }

@@ -10,16 +10,25 @@ class UserFactory extends EloquentModelFactory
 {
     private array $roles = [];
     private array $permissions = [];
+    private ?string $ulid = null;
 
     public static function new(): UserFactory
     {
         return new UserFactory();
     }
 
+    public function ulid(string $ulid): UserFactory
+    {
+        $factory = clone $this;
+        $factory->ulid = $ulid;
+        return $factory;
+    }
+
     public function create(): User
     {
         $user = new User();
         $user->name = fake()->name;
+        $user->ulid = $this->ulid;
         $user->email = fake()->unique()->safeEmail();
         $user->email_verified_at = now();
         $user->password = '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'; // password

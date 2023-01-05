@@ -8,7 +8,6 @@ use App\Models\User;
 use Closure;
 use Database\Factories\ProductFactory;
 use Database\Factories\UserFactory;
-use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\DatabaseTestCase;
 use Tests\Util\AuthorizationCase;
@@ -56,7 +55,7 @@ class UpdateTest extends DatabaseTestCase
         ]);
     }
 
-    public function test_deletes_product(): void
+    public function test_updates_product(): void
     {
         $product = ProductFactory::new()->create();
 

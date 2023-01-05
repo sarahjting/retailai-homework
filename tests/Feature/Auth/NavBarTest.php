@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Enums\PermissionEnum;
 use App\Models\User;
 use Closure;
 use Database\Factories\UserFactory;

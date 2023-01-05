@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Products\ProductsIndexController;
 use App\Http\Controllers\Products\ProductsCrudController;
+use App\Http\Controllers\Users\UserPermissionsController;
 use App\Enums\RoleEnum;
 use App\Enums\PermissionEnum;
 
@@ -32,6 +33,18 @@ Route::middleware('auth')->group(function () {
         Route::delete('/admin/products/{product:sku}', [ProductsCrudController::class, 'delete'])
             ->name('products.admin.delete')
             ->can(PermissionEnum::PRODUCTS_DELETE->value);
+    });
+
+    Route::middleware(sprintf('role:%s', RoleEnum::SUPERADMIN->value))->group(function () {
+        Route::get('/superadmin/users', [UserPermissionsController::class, 'index'])
+            ->name('user_permissions.index')
+            ->can(PermissionEnum::USER_PERMISSIONS_UPDATE->value);
+        Route::get('/superadmin/users/{user:ulid}', [UserPermissionsController::class, 'edit'])
+            ->name('user_permissions.edit')
+            ->can(PermissionEnum::USER_PERMISSIONS_UPDATE->value);
+        Route::put('/superadmin/users/{user:ulid}', [UserPermissionsController::class, 'update'])
+            ->name('user_permissions.update')
+            ->can(PermissionEnum::USER_PERMISSIONS_UPDATE->value);
     });
 });
 
