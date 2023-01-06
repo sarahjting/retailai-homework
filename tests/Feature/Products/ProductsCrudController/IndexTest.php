@@ -42,7 +42,8 @@ class IndexTest extends DatabaseTestCase
         return (new AuthorizationDataProvider)([
             fn (AuthorizationCase $case) => $case->guest()->redirectToMerchantLogin(),
             fn (AuthorizationCase $case) => $case->merchant()->forbidden(),
-            fn (AuthorizationCase $case) => $case->admin()->ok(),
+            fn (AuthorizationCase $case) => $case->admin()->forbidden(),
+            fn (AuthorizationCase $case) => $case->admin()->permissions([PermissionEnum::PRODUCTS_READ->value])->ok(),
             fn (AuthorizationCase $case) => $case->superadmin()->ok(),
         ]);
     }
@@ -52,14 +53,14 @@ class IndexTest extends DatabaseTestCase
      ************************************************/
     public function test_show_link_to_create_page_to_authorized_admins(): void
     {
-        $this->indexProducts(UserFactory::new()->admin()->permissions([PermissionEnum::PRODUCTS_CREATE->value])->create())
+        $this->indexProducts(UserFactory::new()->admin()->permissions([PermissionEnum::PRODUCTS_READ->value, PermissionEnum::PRODUCTS_CREATE->value])->create())
             ->assertOk()
             ->assertSee(route('products.admin.create'));
     }
 
     public function test_do_not_show_link_to_create_page_to_unauthorized_admins(): void
     {
-        $this->indexProducts(UserFactory::new()->admin()->create())
+        $this->indexProducts(UserFactory::new()->admin()->permissions([PermissionEnum::PRODUCTS_READ->value])->create())
             ->assertOk()
             ->assertDontSee(route('products.admin.create'));
     }
@@ -70,7 +71,7 @@ class IndexTest extends DatabaseTestCase
     public function test_show_link_to_edit_page_to_authorized_admins(): void
     {
         $product = ProductFactory::new()->create();
-        $this->indexProducts(UserFactory::new()->admin()->permissions([PermissionEnum::PRODUCTS_UPDATE->value])->create())
+        $this->indexProducts(UserFactory::new()->admin()->permissions([PermissionEnum::PRODUCTS_READ->value, PermissionEnum::PRODUCTS_UPDATE->value])->create())
             ->assertOk()
             ->assertSeeText($product->sku)
             ->assertSee(route('products.admin.edit', ['product' => $product]));
@@ -79,7 +80,7 @@ class IndexTest extends DatabaseTestCase
     public function test_do_not_show_link_to_edit_page_to_unauthorized_admins(): void
     {
         $product = ProductFactory::new()->create();
-        $this->indexProducts(UserFactory::new()->admin()->create())
+        $this->indexProducts(UserFactory::new()->admin()->permissions([PermissionEnum::PRODUCTS_READ->value])->create())
             ->assertOk()
             ->assertSeeText($product->sku)
             ->assertDontSee(route('products.admin.edit', ['product' => $product]));
@@ -90,7 +91,7 @@ class IndexTest extends DatabaseTestCase
      ************************************************/
     public function test_indexes_empty(): void
     {
-        $this->indexProducts(UserFactory::new()->admin()->create())
+        $this->indexProducts(UserFactory::new()->superadmin()->create())
             ->assertOk()
             ->assertSeeText('No products');
     }
@@ -101,7 +102,7 @@ class IndexTest extends DatabaseTestCase
         $products = ProductFactory::new()->createMany(3);
         $deletedProduct = ProductFactory::new()->deleted()->create();
 
-        $res = $this->indexProducts(UserFactory::new()->admin()->create())->assertOk();
+        $res = $this->indexProducts(UserFactory::new()->superadmin()->create())->assertOk();
 
         // see all existing products
         foreach ($products as $product) {
@@ -119,7 +120,7 @@ class IndexTest extends DatabaseTestCase
         /** @var Collection|Product[] $products */
         $products = ProductFactory::new()->createMany($PER_PAGE + 1)->sortBy(fn ($x) => strtolower($x->name))->values();
 
-        $user = UserFactory::new()->admin()->create();
+        $user = UserFactory::new()->superadmin()->create();
         $res = $this->indexProducts($user)->assertOk();
         $res->assertSeeText($products[$PER_PAGE - 1]->sku);
         $res->assertDontSeeText($products[$PER_PAGE]->sku);

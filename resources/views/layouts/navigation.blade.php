@@ -20,16 +20,18 @@
                 </li>
                 <li class="nav-item">
                     @role([\App\Enums\RoleEnum::ADMIN->value, \App\Enums\RoleEnum::SUPERADMIN->value])
-                    <x-nav-link :href="route('products.admin.index')" :active="request()->routeIs('products.admin.index')">
-                        {{ __('Products admin panel') }}
-                    </x-nav-link>
+                        @can(\App\Enums\PermissionEnum::PRODUCTS_READ->value)
+                            <x-nav-link :href="route('products.admin.index')" :active="request()->routeIs('products.admin.index')">
+                                {{ __('Products admin panel') }}
+                            </x-nav-link>
+                        @endcan
                     @endrole
                 </li>
                 <li class="nav-item">
                     @role([\App\Enums\RoleEnum::SUPERADMIN->value])
-                    <x-nav-link :href="route('user_permissions.index')" :active="request()->routeIs('user_permissions.index')">
-                        {{ __('User admin panel') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('user_permissions.index')" :active="request()->routeIs('user_permissions.index')">
+                            {{ __('User admin panel') }}
+                        </x-nav-link>
                     @endrole
                 </li>
             </ul>

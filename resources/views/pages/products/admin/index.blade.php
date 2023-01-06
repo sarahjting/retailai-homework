@@ -29,7 +29,7 @@
                                     <img src="{{ $product->image_url }}" class="img-fluid" />
                                 </td>
                                 <td style="vertical-align: middle">
-                                    @can(\App\Enums\PermissionEnum::PRODUCTS_UPDATE->value)
+                                    @canany([\App\Enums\PermissionEnum::PRODUCTS_UPDATE->value, \App\Enums\PermissionEnum::PRODUCTS_DELETE->value])
                                         <a href="{{ route('products.admin.edit', ['product' => $product]) }}">
                                             {{ $product->sku }}
                                         </a>

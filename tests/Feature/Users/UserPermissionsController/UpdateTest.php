@@ -26,10 +26,12 @@ class UpdateTest extends DatabaseTestCase
             $this->actingAs($user);
         }
 
-        return $this->put(route('user_permissions.update', ['user' => $targetUser]), array_merge([
-            'roles' => $targetUser->roles()->pluck('name')->toArray(),
-            'permissions' => $targetUser->getDirectPermissions()->pluck('name')->toArray(),
-        ], $data));
+        $endpoint = route('user_permissions.update', ['user' => $targetUser]);
+        return $this->from($endpoint)
+            ->put($endpoint, array_merge([
+                'roles' => $targetUser->roles()->pluck('name')->toArray(),
+                'permissions' => $targetUser->getDirectPermissions()->pluck('name')->toArray(),
+            ], $data));
     }
 
     /**
@@ -85,9 +87,9 @@ class UpdateTest extends DatabaseTestCase
         $this->assertFalse($user->hasRole(RoleEnum::SUPERADMIN->value));
     }
 
-    public function test_grant_permissions(): void
+    public function test_grant_admin_permissions_to_admin(): void
     {
-        $user = UserFactory::new()->ulid($this->generateUlid())->create();
+        $user = UserFactory::new()->ulid($this->generateUlid())->admin()->create();
 
         $this->updatePermissions(
             targetUser: $user,
@@ -99,6 +101,24 @@ class UpdateTest extends DatabaseTestCase
 
         $user->refresh();
         $this->assertTrue($user->hasAllPermissions([PermissionEnum::PRODUCTS_UPDATE->value, PermissionEnum::PRODUCTS_CREATE->value]));
+    }
+
+    public function test_grant_admin_permissions_to_merchant_user(): void
+    {
+        $user = UserFactory::new()->ulid($this->generateUlid())->merchant()->create();
+
+        $this->updatePermissions(
+            targetUser: $user,
+            user: UserFactory::new()->superadmin()->create(),
+            data: [
+                'permissions' => [PermissionEnum::PRODUCTS_UPDATE->value, PermissionEnum::PRODUCTS_CREATE->value],
+            ]
+        )
+            ->assertRedirectToRoute('user_permissions.edit', ['user' => $user->ulid])
+            ->assertSessionHasErrorsIn('permissions');
+
+        $user->refresh();
+        $this->assertFalse($user->hasAnyPermission([PermissionEnum::PRODUCTS_UPDATE->value, PermissionEnum::PRODUCTS_CREATE->value]));
     }
 
     public function test_fails_to_grant_superuser_permissions(): void

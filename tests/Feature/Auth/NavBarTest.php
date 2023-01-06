@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\PermissionEnum;
 use App\Models\User;
 use Closure;
 use Database\Factories\UserFactory;
@@ -34,10 +35,18 @@ class NavBarTest extends DatabaseTestCase
         return (new AuthorizationDataProvider)([
             fn (AuthorizationCase $case) => $case->guest()->redirectToMerchantLogin(),
             fn (AuthorizationCase $case) => $case->merchant()->assert(function (TestResponse $response) {
+                $response->assertDontSee(route('products.index'));
+                $response->assertDontSee(route('products.admin.index'));
+            }),
+            fn (AuthorizationCase $case) => $case->merchant()->permissions([PermissionEnum::PRODUCTS_READ->value])->assert(function (TestResponse $response) {
                 $response->assertSee(route('products.index'));
                 $response->assertDontSee(route('products.admin.index'));
             }),
             fn (AuthorizationCase $case) => $case->admin()->assert(function (TestResponse $response) {
+                $response->assertDontSee(route('products.index'));
+                $response->assertDontSee(route('products.admin.index'));
+            }),
+            fn (AuthorizationCase $case) => $case->admin()->permissions([PermissionEnum::PRODUCTS_READ->value])->assert(function (TestResponse $response) {
                 $response->assertSee(route('products.index'));
                 $response->assertSee(route('products.admin.index'));
             }),

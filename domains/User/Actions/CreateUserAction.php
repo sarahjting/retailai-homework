@@ -21,7 +21,7 @@ class CreateUserAction
 
         $user->assignRole($role);
         $user->syncPermissions(
-            collect(RoleEnum::tryFrom($role->name)
+            collect(RoleEnum::fromModel($role)
                 ->defaultPermissions())
                 ->map(fn (PermissionEnum $enum) => $enum->value)
         );

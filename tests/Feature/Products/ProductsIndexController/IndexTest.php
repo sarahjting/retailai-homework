@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Products\ProductsIndexController;
 
+use App\Enums\PermissionEnum;
 use App\Models\Product;
 use App\Models\User;
 use Closure;
@@ -36,15 +37,17 @@ class IndexTest extends DatabaseTestCase
     {
         return (new AuthorizationDataProvider)([
             fn (AuthorizationCase $case) => $case->guest()->redirectToMerchantLogin(),
-            fn (AuthorizationCase $case) => $case->merchant()->ok(),
-            fn (AuthorizationCase $case) => $case->admin()->ok(),
+            fn (AuthorizationCase $case) => $case->merchant()->forbidden(),
+            fn (AuthorizationCase $case) => $case->merchant()->permissions([PermissionEnum::PRODUCTS_READ->value])->ok(),
+            fn (AuthorizationCase $case) => $case->admin()->forbidden(),
+            fn (AuthorizationCase $case) => $case->admin()->permissions([PermissionEnum::PRODUCTS_READ->value])->ok(),
             fn (AuthorizationCase $case) => $case->superadmin()->ok(),
         ]);
     }
 
     public function test_indexes_empty(): void
     {
-        $this->indexProducts(UserFactory::new()->merchant()->create())
+        $this->indexProducts(UserFactory::new()->superadmin()->create())
             ->assertOk()
             ->assertSeeText('No products');
     }
@@ -55,7 +58,7 @@ class IndexTest extends DatabaseTestCase
         $products = ProductFactory::new()->createMany(3);
         $deletedProduct = ProductFactory::new()->deleted()->create();
 
-        $res = $this->indexProducts(UserFactory::new()->merchant()->create())->assertOk();
+        $res = $this->indexProducts(UserFactory::new()->superadmin()->create())->assertOk();
 
         // see all existing products
         foreach ($products as $product) {
@@ -73,7 +76,7 @@ class IndexTest extends DatabaseTestCase
         /** @var Collection|Product[] $products */
         $products = ProductFactory::new()->createMany($PER_PAGE + 1)->sortBy(fn ($x) => strtolower($x->name))->values();
 
-        $user = UserFactory::new()->merchant()->create();
+        $user = UserFactory::new()->superadmin()->create();
         $res = $this->indexProducts($user)->assertOk();
         $res->assertSeeText($products[$PER_PAGE - 1]->sku);
         $res->assertDontSeeText($products[$PER_PAGE]->sku);

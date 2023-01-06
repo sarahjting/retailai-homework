@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="card p-4">
-        <h2>{{ \App\Enums\RoleEnum::tryFrom(request()->route('role')->name)->label() }} login</h2>
+        <h2>{{ \App\Enums\RoleEnum::fromModel(request()->route('role'))->label() }} login</h2>
 
         <x-auth-session-status class="mb-4" :status="session('status')" />
 

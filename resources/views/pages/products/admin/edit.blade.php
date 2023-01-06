@@ -4,12 +4,15 @@
             <div class="card p-4 mb-4">
                 <h2>{{ __('Update product:') }} {{ $product->name }}</h2>
                 <img src="{{ $product->image_url }}" class="img-fluid mb-4"/>
+                @can(\App\Enums\PermissionEnum::PRODUCTS_UPDATE->value)
                 <form method="POST" action="{{ route('products.admin.update', ['product' => $product]) }}" enctype="multipart/form-data">
                     @method('PUT')
                     <x-forms.product-form :product="$product"></x-forms.product-form>
                     <x-primary-button class="w-100">{{ __('Update') }}</x-primary-button>
                 </form>
+                @endcan
             </div>
+            @can(\App\Enums\PermissionEnum::PRODUCTS_DELETE->value)
             <div class="card p-4">
                 <h2>{{ __('Delete product') }}</h2>
                 <form method="POST" action="{{ route('products.admin.delete', ['product' => $product]) }}">
@@ -18,6 +21,7 @@
                     <x-danger-button class="w-100">{{ __('Delete') }}</x-danger-button>
                 </form>
             </div>
+            @endcan
         </div>
     </div>
 </x-app-layout>

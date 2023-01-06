@@ -4,10 +4,10 @@ namespace App\Http\Requests;
 
 use App\Enums\PermissionEnum;
 use App\Enums\RoleEnum;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
-use function collect;
 
 /**
  * @property array|RoleEnum[] $roles
@@ -26,7 +26,11 @@ class UpdateUserPermissionsRequest extends FormRequest
             'permissions' => ['nullable', 'array'],
             'permissions.*' => [
                 new Enum(PermissionEnum::class),
-                Rule::in(collect(PermissionEnum::adminnablePermissions())->map(fn (PermissionEnum $enum) => $enum->value)),
+                function ($_, string $val, Closure $fail) {
+                    if (!PermissionEnum::tryFrom($val)?->isAvailableToRoles($this->route('user')->roles)) {
+                        $fail(__('This permission is not available to this user.'));
+                    }
+                }
             ],
         ];
     }

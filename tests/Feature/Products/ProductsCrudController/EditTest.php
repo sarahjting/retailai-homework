@@ -50,4 +50,25 @@ class EditTest extends DatabaseTestCase
             ->assertOk()
             ->assertSeeText($product->name);
     }
+
+    /**
+     * @dataProvider provider_renders_delete_form
+     */
+    public function test_renders_delete_form(UserFactory $userFactory, Closure $assert): void
+    {
+        $product = ProductFactory::new()->create();
+        $assert($this->editProduct($product, $userFactory->create()));
+    }
+
+    public function provider_renders_delete_form(): array
+    {
+        $assertSeeDelete = fn (TestResponse $res) => $res->assertOk()->assertSeeText('Delete product');
+        $assertDontSeeDelete = fn (TestResponse $res) => $res->assertOk()->assertDontSeeText('Delete product');
+        return (new AuthorizationDataProvider)([
+            fn (AuthorizationCase $case) => $case->merchant()->forbidden(),
+            fn (AuthorizationCase $case) => $case->admin()->permissions([PermissionEnum::PRODUCTS_UPDATE->value])->assert($assertDontSeeDelete),
+            fn (AuthorizationCase $case) => $case->admin()->permissions([PermissionEnum::PRODUCTS_DELETE->value])->assert($assertSeeDelete),
+            fn (AuthorizationCase $case) => $case->superadmin()->assert($assertSeeDelete),
+        ]);
+    }
 }

@@ -37,7 +37,7 @@
                                     :checked="$user->hasRole($roleEnum->value)"
                                     :disabled="!in_array($roleEnum, \App\Enums\RoleEnum::adminnableRoles())"
                                 >
-                                    {{ $roleEnum->name }}
+                                    {{ $roleEnum->label() }}
                                 </x-checkbox-toggle-input>
                             @endforeach
                             <x-input-error :messages="$errors->get('roles')" class="mt-2" />
@@ -52,12 +52,11 @@
                                     :value="$permissionEnum->value"
                                     :id="sprintf('permission_%s', $permissionEnum->value)"
                                     :checked="$user->hasPermissionTo($permissionEnum->value)"
-                                    :disabled="($user->hasPermissionTo($permissionEnum->value) && !$user->hasDirectPermission($permissionEnum->value))
-                                        || !in_array($permissionEnum, \App\Enums\PermissionEnum::adminnablePermissions())">
-                                    {{ $permissionEnum->name }}
+                                    :disabled="!$permissionEnum->isAvailableToRoles($user->roles)">
+                                    {{ $permissionEnum->label() }}
                                 </x-checkbox-toggle-input>
                             @endforeach
-                            <x-input-error :messages="$errors->get('permissions')" class="mt-2" />
+                            <x-input-error :messages="collect($errors->get('permissions.*'))->join('')" class="mt-2" />
                         </div>
                     </div>
                     <x-primary-button class="w-100">{{ __('Update') }}</x-primary-button>

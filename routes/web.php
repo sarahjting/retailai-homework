@@ -17,7 +17,9 @@ Route::middleware('auth')->group(function () {
         ->can(PermissionEnum::PRODUCTS_READ->value);
 
     Route::middleware(sprintf('role:%s|%s', RoleEnum::ADMIN->value, RoleEnum::SUPERADMIN->value))->group(function () {
-        Route::get('/admin/products', [ProductsCrudController::class, 'index'])->name('products.admin.index');
+        Route::get('/admin/products', [ProductsCrudController::class, 'index'])
+            ->name('products.admin.index')
+            ->can(PermissionEnum::PRODUCTS_READ->value);
         Route::get('/admin/products/create', [ProductsCrudController::class, 'create'])
             ->name('products.admin.create')
             ->can(PermissionEnum::PRODUCTS_CREATE->value);
@@ -26,7 +28,7 @@ Route::middleware('auth')->group(function () {
             ->can(PermissionEnum::PRODUCTS_CREATE->value);
         Route::get('/admin/products/{product:sku}', [ProductsCrudController::class, 'edit'])
             ->name('products.admin.edit')
-            ->can(PermissionEnum::PRODUCTS_UPDATE->value);
+            ->middleware(sprintf('permission:%s|%s', PermissionEnum::PRODUCTS_UPDATE->value, PermissionEnum::PRODUCTS_DELETE->value));
         Route::put('/admin/products/{product:sku}', [ProductsCrudController::class, 'update'])
             ->name('products.admin.update')
             ->can(PermissionEnum::PRODUCTS_UPDATE->value);
