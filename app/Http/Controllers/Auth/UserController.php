@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\CreateUserRequest;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Domains\User\Actions\CreateUserAction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -21,20 +22,13 @@ class UserController extends Controller
         return view('auth.register');
     }
 
-    public function store(CreateUserRequest $request, Role $role): RedirectResponse
+    public function store(CreateUserRequest $request, Role $role, CreateUserAction $createUserAction): RedirectResponse
     {
-        /** @var User $user */
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        $user->assignRole($role);
-        $user->syncPermissions(
-            collect(RoleEnum::tryFrom($role->name)
-                ->defaultPermissions())
-                ->map(fn (PermissionEnum $enum) => $enum->value)
+        $user = $createUserAction->execute(
+            name: $request->name,
+            email: $request->email,
+            password: $request->password,
+            role: $role,
         );
 
         Auth::login($user);
