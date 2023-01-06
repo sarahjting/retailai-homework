@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Products;
 
+use App\Enums\PermissionEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use App\Models\User;
 use Domains\Product\Actions\CreateProductAction;
 use Domains\Product\Actions\DeleteProductAction;
 use Domains\Product\Actions\PaginateProductsAction;
@@ -36,7 +38,11 @@ class ProductsCrudController extends Controller
             image: $request->image,
         );
 
-        return redirect()->to(route('products.admin.edit', ['product' => $product]));
+        /** @var User $user */
+        $user = $request->user();
+        return redirect()->to($user->can(PermissionEnum::PRODUCTS_UPDATE->value)
+            ? route('products.admin.edit', ['product' => $product])
+            : route('products.admin.index'));
     }
 
     public function edit(Product $product): View

@@ -48,11 +48,13 @@ class StoreTest extends DatabaseTestCase
     public function provider_authorizes(): array
     {
         $assertOk = fn (TestResponse $response) => $response->assertRedirectToRoute('products.admin.edit', ['product' => $this->generateSku()]);
+        $assertOkRedirectToIndex = fn (TestResponse $response) => $response->assertRedirectToRoute('products.admin.index');
         return (new AuthorizationDataProvider)([
             fn (AuthorizationCase $case) => $case->guest()->redirectToMerchantLogin(),
             fn (AuthorizationCase $case) => $case->merchant()->forbidden(),
             fn (AuthorizationCase $case) => $case->admin()->forbidden(),
-            fn (AuthorizationCase $case) => $case->admin()->permissions([PermissionEnum::PRODUCTS_CREATE->value])->assert($assertOk),
+            fn (AuthorizationCase $case) => $case->admin()->permissions([PermissionEnum::PRODUCTS_CREATE->value])->assert($assertOkRedirectToIndex),
+            fn (AuthorizationCase $case) => $case->admin()->permissions([PermissionEnum::PRODUCTS_CREATE->value, PermissionEnum::PRODUCTS_UPDATE->value])->assert($assertOk),
             fn (AuthorizationCase $case) => $case->superadmin()->assert($assertOk),
         ]);
     }
