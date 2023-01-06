@@ -13,6 +13,9 @@ class PaginateUsersAction
             $orderBy = 'email';
         }
 
-        return User::orderBy($orderBy)->orderBy('id')->paginate(8);
+        return User::orderBy($orderBy)
+            ->orderBy('id')
+            ->with('roles')
+            ->paginate(8);
     }
 }
