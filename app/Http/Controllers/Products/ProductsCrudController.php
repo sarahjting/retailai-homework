@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Products;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\CreateProductRequest;
-use App\Http\Requests\Auth\UpdateProductRequest;
+use App\Http\Requests\CreateProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use Domains\Product\Actions\CreateProductAction;
 use Domains\Product\Actions\DeleteProductAction;

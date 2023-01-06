@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\UpdateUserPermissionsRequest;
+use App\Http\Requests\UpdateUserPermissionsRequest;
 use App\Models\User;
 use Domains\User\Actions\PaginateUsersAction;
 use Domains\User\Actions\UpdateUserPermissionsAction;
