@@ -55,12 +55,17 @@ class ProductsCrudController extends Controller
             description: $request->description ?? '',
             image: $request->image,
         );
-        return redirect()->to(route('products.admin.edit', ['product' => $product]));
+
+        return redirect()
+            ->to(route('products.admin.edit', ['product' => $product]))
+            ->withSuccess(__('Product has been updated.'));
     }
 
     public function delete(Product $product, DeleteProductAction $deleteProductAction): RedirectResponse
     {
         $deleteProductAction->execute($product);
-        return redirect()->to(route('products.admin.index'));
+        return redirect()
+            ->to(route('products.admin.index'))
+            ->withSuccess(__('Product has been deleted.'));
     }
 }

@@ -18,6 +18,11 @@
 
         <!-- Page Content -->
         <main>
+            @if (session()->has('success'))
+                <div class="alert alert-success rounded-0">
+                    {{ session()->get('success') }}
+                </div>
+            @endif
             <div class="container">
                 {{ $slot }}
             </div>

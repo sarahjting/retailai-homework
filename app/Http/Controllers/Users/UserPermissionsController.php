@@ -34,6 +34,8 @@ class UserPermissionsController extends Controller
             roles: $request->get('roles', []),
             permissions: $request->get('permissions', []),
         );
-        return redirect()->to(route('user_permissions.edit', ['user' => $user]));
+        return redirect()
+            ->to(route('user_permissions.edit', ['user' => $user]))
+            ->withSuccess(__('User permissions have been updated.'));
     }
 }
