@@ -6,18 +6,33 @@
   - In this scenario I want to avoid the duplicated code and just provide a generic base with different authorization/implementation. I wouldn't be against splitting the code into completely separated controllers, though.
 
 ## Setup
-1. Sail up
+1. Install dependencies
     ```
-    docker compose up
+    composer i
     ```
-2. Link storage folders
+2. Sail up
+    ```
+    ./vendor/bin/sail up
+    ```
+3. Environment
    ```
-    ./vendor/bin/sail artisan storage:link
+   cp .env.example .env
+   ./vendor/bin/sail artisan key:generate
    ```
-3. Migrations
+4. Assets
+   ```
+   npm i
+   npm run build
+   ```
+5. Link storage folders
+   ```
+   ./vendor/bin/sail artisan storage:link
+   ```
+6. Migrations
    ```
    ./vendor/bin/sail artisan migrate
    ```
+7. Find development environment at http://localhost by default
 
 ## Screenshots
 
